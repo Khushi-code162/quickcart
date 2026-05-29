@@ -9,14 +9,14 @@ const { sendSuccess, sendError } = require('../utils/response.utils.js')
 // -------- REGISTER --------
 const register = async (req, res) => {
   try {
-    const { name, email, password } = req.body
+    const { name, email, password ,role} = req.body
 
     const existingUser = await User.findOne({ email })
     if (existingUser) {
       return sendError(res, 'Email already registered', 400)
     }
 
-    const user = await User.create({ name, email, password })
+    const user = await User.create({ name, email, password ,role})
 
     const accessToken = generateAccessToken(user._id, user.role)
     const refreshToken = generateRefreshToken(user._id)
