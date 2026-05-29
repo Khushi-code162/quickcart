@@ -8,6 +8,7 @@ const connectDB = require('./config/db')
 const authRoutes = require('./routes/auth.routes')
 const productRoutes = require('./routes/product.routes')
 const app = express();
+const redis = require('./config/redis.js')
 
 app.use(cors());
 app.use(helmet());
