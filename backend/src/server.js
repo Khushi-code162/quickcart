@@ -7,7 +7,8 @@ const connectDB = require('./config/db')
 
 const authRoutes = require('./routes/auth.routes')
 const productRoutes = require('./routes/product.routes')
-const cartRoutes = require('../src/routes/cart.routes.js')
+const cartRoutes = require('./routes/cart.routes.js')
+const orderRoutes = require('./routes/order.routes.js')
 const app = express();
 const redis = require('./config/redis.js')
 
@@ -19,6 +20,7 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/cart',cartRoutes);
+app.use('/api/orders', orderRoutes);
 
 app.get('/health', (req, res) => {
   res.json({ status: 'OK' })
