@@ -1,5 +1,8 @@
 const Product = require('../models/product.js')
 const { sendSuccess, sendError } = require('../utils/response.utils.js')
+const redis = require('../config/redis')
+
+
 
 // -------- GET ALL PRODUCTS --------
 // GET /api/products?category=electronics&minPrice=100&maxPrice=5000&page=1&limit=10
@@ -90,6 +93,9 @@ const createProduct = async (req, res) => {
       flashSalePrice
     })
 
+    // Product create hone ke baad yeh add karo
+  await redis.set(`stock:${product._id}`, product.stock)
+
     return sendSuccess(res, { product }, 'Product created successfully', 201)
   } catch (error) {
     return sendError(res, error.message)
@@ -134,6 +140,7 @@ const getFlashSaleProducts = async (req, res) => {
     return sendError(res, error.message)
   }
 }
+
 
 module.exports = {
   getAllProducts,
