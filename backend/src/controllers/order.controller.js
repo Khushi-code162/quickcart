@@ -1,6 +1,18 @@
 const Order = require('../models/order.js')
 const { getCart, clearCart } = require('../services/cart.service.js')
 const { sendSuccess, sendError } = require('../utils/response.utils.js')
+const { notificationQueue } = require('../config/queue')
+
+// Professional message function
+const getStatusMessage = (status, orderId) => {
+  const messages = {
+    CONFIRMED: `Your order #${orderId} has been confirmed! We're preparing it for shipment.`,
+    SHIPPED: `Great news! Your order #${orderId} has been shipped and is on its way to you.`,
+    DELIVERED: `Your order #${orderId} has been delivered successfully. Thank you for shopping with QuickKart!`,
+    CANCELLED: `Your order #${orderId} has been cancelled. If you have any questions, please contact support.`
+  }
+  return messages[status] || `Your order #${orderId} status has been updated to ${status}.`
+}
 
 // -------- PLACE ORDER --------
 const placeOrder = async (req, res) => {
@@ -72,7 +84,6 @@ const updateStatus = async (req, res) => {
 
     if (!order) return sendError(res, 'Order not found', 404)
 
-    // State machine check
     const validNext = VALID_TRANSITIONS[order.status]
     if (!validNext.includes(status)) {
       return sendError(res, `Cannot change from ${order.status} to ${status}`, 400)
@@ -81,6 +92,22 @@ const updateStatus = async (req, res) => {
     order.status = status
     order.statusHistory.push({ status, note })
     await order.save()
+
+    const getStatusMessage = (status, orderId) => {
+    const messages = {
+    CONFIRMED: `Your order #${orderId} has been confirmed! We're preparing it for shipment.`,
+    SHIPPED: `Great news! Your order #${orderId} has been shipped and is on its way to you.`,
+    DELIVERED: `Your order #${orderId} has been delivered successfully. Thank you for shopping with QuickKart!`,
+    CANCELLED: `Your order #${orderId} has been cancelled. If you have any questions, please contact support.`
+  }
+  return messages[status] || `Your order #${orderId} status has been updated to ${status}.`
+}
+    // Notification queue mein add karo
+    notificationQueue.add('notify', {
+      userId: order.user,
+      type: `ORDER_${status}`,
+      message: getStatusMessage(status, order._id)
+    }).catch(err => console.error('Queue error:', err.message))
 
     return sendSuccess(res, { order }, 'Status updated')
   } catch (error) {

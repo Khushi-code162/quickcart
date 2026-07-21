@@ -12,7 +12,9 @@ const orderRoutes = require('./routes/order.routes.js')
 const app = express();
 const redis = require('./config/redis.js')
 const flashSaleRoutes = require('./routes/flashsale.routes')
+const notificationRoutes = require('./routes/notification.routes.js')
 require('./workers/flashsale.worker')
+require('./workers/notification.worker')
 
 app.use(cors());
 app.use(helmet());
@@ -26,6 +28,7 @@ app.use('/api/orders', orderRoutes);
 
 
 app.use('/api/flash-sale', flashSaleRoutes)
+app.use('/api/notifications', notificationRoutes)
 
 app.get('/health', (req, res) => {
   res.json({ status: 'OK' })
