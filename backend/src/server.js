@@ -1,4 +1,7 @@
-require('dotenv').config()
+require("dotenv").config();
+
+console.log("cwd:", process.cwd());
+console.log("MONGO_URI:", process.env.MONGO_URI);
 const express = require('express')
 const cors = require('cors')
 const helmet = require('helmet')
@@ -23,7 +26,7 @@ app.use(express.json());
 
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
-app.use('/api/cart',cartRoutes);
+app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
 
 
